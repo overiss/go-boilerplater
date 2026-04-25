@@ -11,7 +11,6 @@ const (
 
 import (
 	"context"
-	"fmt"
 	"log"
 )
 
@@ -32,12 +31,6 @@ func (a *Application) initHandlerContainer(ctx context.Context) {
 func (a *Application) initServiceContainer(ctx context.Context) {
 	_ = ctx
 	// TODO: initialize service container and append starters/readiness checks.
-}
-
-func (a *Application) failInit(ctx context.Context, component string, err error) {
-	_ = ctx
-	log.Printf("cannot init %s: %v", component, err)
-	panic(fmt.Errorf("cannot init %s: %w", component, err))
 }
 `
 	routingTemplate = `package app
@@ -117,7 +110,8 @@ func main() {
 	log.Printf("config initialized")
 
 	application := app.Init(ctx, cfg)
-	log.Printf("service initialized successfully; remember to replace standard log with your project logger")
+	log.Printf("service initialized successfully")
+	log.Printf("IMPORTANT: replace all log.Printf/log.Println/log.Fatalf calls with your project logger")
 	go application.Start(ctx)
 
 	if err := erg.Wait(); err != nil {
@@ -190,7 +184,6 @@ func configTemplate(serviceName string) string {
 	return fmt.Sprintf(`package config
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -305,17 +298,11 @@ func NewHttp(cfg *config.HttpServer, isDebug bool) *Http {
 	}
 }
 
-func (s *Http) Start(ctx context.Context) {
+func (s *Http) Start(_ context.Context) {
 	log.Printf("%%s starting", s.name)
 
 	if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("%%s failed to start: %%v", s.name, err)
-	}
-
-	select {
-	case <-ctx.Done():
-		return
-	default:
 	}
 }
 
