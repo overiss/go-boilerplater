@@ -38,16 +38,16 @@ const (
 
 func buildFiles(serviceName, moduleName string) map[string]string {
 	return map[string]string{
-		filepath.Join("cmd", serviceName, "main.go"): mainGoTemplate(serviceName),
+		filepath.Join("cmd", serviceName, "main.go"): mainGoTemplate(moduleName),
 		appGoPath:             appTemplate(moduleName),
 		creatorGoPath:         creatorTemplate,
 		routingGoPath:         routingTemplate,
 		behaviorGoPath:        behaviorTemplate,
-		configGoPath:          configTemplate,
+		configGoPath:          configTemplate(serviceName),
 		requestGoPath:         modelTemplate,
 		responseGoPath:        modelTemplate,
 		serverContainerGoPath: serverContainerTemplate(moduleName),
-		httpServerGoPath:      httpServerTemplate,
+		httpServerGoPath:      httpServerTemplate(moduleName),
 		handlerContainerPath:  handlerContainerTemplate,
 		serviceContainerPath:  serviceContainerTemplate,
 		varsGoPath:            varsTemplate,
