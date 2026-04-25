@@ -4,13 +4,21 @@ Go CLI tool that generates a default service structure.
 
 ## Install
 
-From repository root:
+Install latest version:
 
 ```bash
-go install ./cmd/boilerplater
+go install github.com/overiss/go-boilerplater@latest
 ```
 
 This will install the `boilerplater` binary into your Go bin path (`$(go env GOPATH)/bin` by default).
+
+Install exact version:
+
+```bash
+go install github.com/overiss/go-boilerplater@v0.1.1
+```
+
+Only root install path is supported now (no `cmd/boilerplater` entrypoint).
 
 ## Usage
 

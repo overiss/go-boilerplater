@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"flag"
@@ -9,23 +9,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/overiss/boilerplater/internal/scaffold"
+	"github.com/overiss/go-boilerplater/internal/scaffold"
 )
 
-func main() {
-	if len(os.Args) < 2 {
+func Run(args []string) int {
+	if len(args) < 2 {
 		printUsage()
-		os.Exit(1)
+		return 1
 	}
 
-	switch os.Args[1] {
+	switch args[1] {
 	case "make":
-		makeCmd := flag.NewFlagSet("make", flag.ExitOnError)
+		makeCmd := flag.NewFlagSet("make", flag.ContinueOnError)
+		makeCmd.SetOutput(os.Stderr)
+
 		service := makeCmd.String("service", "", "service name for cmd/<service>/main.go")
 		moduleName := makeCmd.String("module", "", "go module for generated service (e.g. github.com/org/service)")
 
-		if err := makeCmd.Parse(os.Args[2:]); err != nil {
+		if err := makeCmd.Parse(args[2:]); err != nil {
 			exitWithError(err)
+			return 1
 		}
 
 		rootPath := "."
@@ -34,6 +37,7 @@ func main() {
 			absRoot, err := filepath.Abs(rootPath)
 			if err != nil {
 				exitWithError(fmt.Errorf("resolve path: %w", err))
+				return 1
 			}
 			serviceName = filepath.Base(absRoot)
 		} else {
@@ -42,12 +46,14 @@ func main() {
 
 		if strings.TrimSpace(*moduleName) == "" {
 			exitWithError(fmt.Errorf("--module is required"))
+			return 1
 		}
 
 		loader := startLoader("creating project structure")
 		if err := scaffold.Make(rootPath, serviceName, *moduleName); err != nil {
 			loader.stop(false)
 			exitWithError(err)
+			return 1
 		}
 		loader.stop(true)
 
@@ -55,6 +61,7 @@ func main() {
 		if err := runCmd(rootPath, "go", "mod", "init", *moduleName); err != nil {
 			loader.stop(false)
 			exitWithError(err)
+			return 1
 		}
 		loader.stop(true)
 
@@ -62,13 +69,15 @@ func main() {
 		if err := runCmd(rootPath, "go", "mod", "tidy"); err != nil {
 			loader.stop(false)
 			exitWithError(err)
+			return 1
 		}
 		loader.stop(true)
 
 		fmt.Println("boilerplater: structure created successfully")
+		return 0
 	default:
 		printUsage()
-		os.Exit(1)
+		return 1
 	}
 }
 
@@ -79,7 +88,6 @@ func printUsage() {
 
 func exitWithError(err error) {
 	fmt.Fprintf(os.Stderr, "boilerplater error: %v\n", err)
-	os.Exit(1)
 }
 
 type loader struct {
