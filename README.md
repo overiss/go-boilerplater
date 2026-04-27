@@ -22,7 +22,7 @@ This will install the `go-boilerplater` binary into your Go bin path (`$(go env 
 Install exact version:
 
 ```bash
-go install github.com/overiss/go-boilerplater@v0.1.1
+go install github.com/overiss/go-boilerplater@v1.1.0
 ```
 
 ## Usage
