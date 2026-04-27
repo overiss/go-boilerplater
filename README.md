@@ -1,7 +1,7 @@
 # boilerplater
 
 `boilerplater` is a Go CLI tool for quickly bootstrapping a service with a
-consistent project layout and стартовыми шаблонами файлов.
+consistent project layout.
 
 Tool helps to:
 
